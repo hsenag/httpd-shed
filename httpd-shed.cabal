@@ -15,7 +15,7 @@ Copyright:      (c) 2009 Andy Gill
 Build-Type:     Simple
 cabal-version:  >= 1.6
 
-Source-Repository this
+Source-Repository head
   Type:        git
   Location:    https://github.com/hsenag/httpd-shed/
 
