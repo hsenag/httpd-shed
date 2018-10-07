@@ -33,7 +33,7 @@ Library
   else
      build-depends: network-uri < 2.6, network < 2.6
   Build-Depends:
-    network >=2.3     && <2.8,
+    network >=2.3     && <2.9,
     network-uri >=2.5 && <2.7,
     base >= 4.0 && <5.0
   Ghc-Options: -Wall
