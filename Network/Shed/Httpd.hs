@@ -19,6 +19,7 @@
 -- Handling of POST-based payloads was been written by Brandon Moore.
 -- initServerBind support was written by John Van Enk.
 
+{-# LANGUAGE CPP #-}
 module Network.Shed.Httpd 
     ( Server
     , initServer
@@ -33,22 +34,30 @@ module Network.Shed.Httpd
     , contentType
     ) where
 
-import qualified Network as Network
 import qualified Network.Socket as Socket
 import Network.URI (URI, parseURIReference, unEscapeString)
 import Network.BSD (getProtocolNumber)
+#if MIN_VERSION_network(3,0,0)
+#else
+import Network.Socket (iNADDR_ANY)
+#endif
 import Network.Socket (
-          SockAddr(SockAddrInet), iNADDR_ANY,
-          bindSocket, setSocketOption, socket)
+          SockAddr(SockAddrInet),
+          setSocketOption, socket)
 
 import Control.Concurrent (forkIO)
 import Control.Exception (finally)
 
-import System.IO (Handle, hPutStr, hClose, hGetLine, hGetContents)
+import System.IO (Handle, hPutStr, hClose, hGetLine, hGetContents, IOMode(..))
 
 import qualified Data.Char as Char
 import Numeric (showHex)
 
+
+#if MIN_VERSION_network(3,0,0)
+iNADDR_ANY :: Socket.HostAddress
+iNADDR_ANY = Socket.tupleToHostAddress (0,0,0,0)
+#endif
 
 type Server = () -- later, we might have a handle for shutting down a server.
 
@@ -145,11 +154,12 @@ initServerMain processBody sockAddr callOut = do
         num <- getProtocolNumber "tcp"
         sock <- socket Socket.AF_INET Socket.Stream num
         setSocketOption sock Socket.ReuseAddr 1
-        bindSocket sock sockAddr
+        Socket.bind sock sockAddr
         Socket.listen sock Socket.maxListenQueue
 
         loopIO  
-           (do (h,_nm,_port) <- Network.accept sock
+           (do (acceptedSock,_) <- Socket.accept sock
+               h <- Socket.socketToHandle acceptedSock ReadWriteMode
                forkIO $ do 
                  ln <- hGetLine h
                  case words ln of
@@ -160,7 +170,7 @@ initServerMain processBody sockAddr callOut = do
                                  hClose h
                    _                      -> hClose h
                  return ()
-           ) `finally` Socket.sClose sock
+           ) `finally` Socket.close sock
   where 
       loopIO m = m >> loopIO m
 
