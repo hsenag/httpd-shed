@@ -57,9 +57,9 @@ This server transfers documents as one parcel, using the content-length header.
 -}
 
 initServer
-   :: Int 			-- ^ The port number
-   -> (Request -> IO Response) 	-- ^ The functionality of the Server
-   -> IO Server			-- ^ A token for the Server
+   :: Int                       -- ^ The port number
+   -> (Request -> IO Response)  -- ^ The functionality of the Server
+   -> IO Server                 -- ^ A token for the Server
 initServer port =
   initServerMain
      (\body -> ([("Content-Length", show (length body))], body))
@@ -73,13 +73,13 @@ It inserts the transfer encoding header for you.
 The server binds to all interfaces
 -}
 initServerLazy
-   :: Int 			-- ^ Chunk size
-   -> Int 			-- ^ The port number
-   -> (Request -> IO Response) 	-- ^ The functionality of the Server
-   -> IO Server			-- ^ A token for the Server
+   :: Int                       -- ^ Chunk size
+   -> Int                       -- ^ The port number
+   -> (Request -> IO Response)  -- ^ The functionality of the Server
+   -> IO Server                 -- ^ A token for the Server
 initServerLazy chunkSize port =
   initServerLazyBind chunkSize port iNADDR_ANY
-     
+
 {- |
 This server transfers documents in chunked mode
 and without content-length header.
@@ -88,11 +88,11 @@ It inserts the transfer encoding header for you.
 The server binds to the specified address.
 -}
 initServerLazyBind
-   :: Int 			-- ^ Chunk size
-   -> Int 			-- ^ The port number
+   :: Int                       -- ^ Chunk size
+   -> Int                       -- ^ The port number
    -> Socket.HostAddress        -- ^ The host address
-   -> (Request -> IO Response) 	-- ^ The functionality of the Server
-   -> IO Server			-- ^ A token for the Server
+   -> (Request -> IO Response)  -- ^ The functionality of the Server
+   -> IO Server                 -- ^ A token for the Server
 initServerLazyBind chunkSize port addr =
   initServerMain
      (\body ->
@@ -171,7 +171,7 @@ initServerMain processBody sockAddr callOut = do
           (name@"Content-Length",':':rest) ->
             readHeaders h mode uri (hds ++ [(name,dropWhile Char.isSpace rest)]) (Just (read rest))
           (name,':':rest) -> readHeaders h mode uri (hds ++ [(name,dropWhile Char.isSpace rest)]) clen
-          _ -> hClose h	-- strange format
+          _ -> hClose h -- strange format
 
       message code = show code ++ " " ++ 
                      case lookup code longMessages of
@@ -217,7 +217,7 @@ queryToArguments input = findIx input
      findVal' _ _ = []
 
 data Request = Request 
-     { reqMethod  :: String	
+     { reqMethod  :: String
      , reqURI     :: URI
      , reqHeaders :: [(String,String)]
      , reqBody    :: String
@@ -225,7 +225,7 @@ data Request = Request
      deriving Show
 
 data Response = Response
-    { resCode	 :: Int
+    { resCode    :: Int
     , resHeaders :: [(String,String)]
     , resBody    :: String
     }
