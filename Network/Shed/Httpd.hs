@@ -24,6 +24,7 @@ module Network.Shed.Httpd
     , initServer
     , initServerLazy
     , initServerBind
+    , initServerLazyBind
     , Request(..)
     , Response(..)
     , queryToArguments
@@ -69,6 +70,7 @@ This server transfers documents in chunked mode
 and without content-length header.
 This way you can ship infinitely big documents.
 It inserts the transfer encoding header for you.
+The server binds to all interfaces
 -}
 initServerLazy
    :: Int 			-- ^ Chunk size
@@ -76,6 +78,22 @@ initServerLazy
    -> (Request -> IO Response) 	-- ^ The functionality of the Server
    -> IO Server			-- ^ A token for the Server
 initServerLazy chunkSize port =
+  initServerLazyBind chunkSize port iNADDR_ANY
+     
+{- |
+This server transfers documents in chunked mode
+and without content-length header.
+This way you can ship infinitely big documents.
+It inserts the transfer encoding header for you.
+The server binds to the specified address.
+-}
+initServerLazyBind
+   :: Int 			-- ^ Chunk size
+   -> Int 			-- ^ The port number
+   -> Socket.HostAddress        -- ^ The host address
+   -> (Request -> IO Response) 	-- ^ The functionality of the Server
+   -> IO Server			-- ^ A token for the Server
+initServerLazyBind chunkSize port addr =
   initServerMain
      (\body ->
         ([("Transfer-Encoding", "chunked")],
@@ -90,8 +108,9 @@ initServerLazy chunkSize port =
          -- terminating trailer
          showCRLF :
          []))
-     (SockAddrInet (fromIntegral port) iNADDR_ANY)
+     (SockAddrInet (fromIntegral port) addr)
      
+
 showCRLF :: ShowS
 showCRLF = showString "\r\n"
 
