@@ -178,9 +178,12 @@ initServerMain processBody sockAddr callOut = do
         line <- hGetLine h
         case span (/= ':') line of
           ("\r","") -> sendRequest h mode uri hds clen
-          (name@"Content-Length",':':rest) ->
-            readHeaders h mode uri (hds ++ [(name,dropWhile Char.isSpace rest)]) (Just (read rest))
-          (name,':':rest) -> readHeaders h mode uri (hds ++ [(name,dropWhile Char.isSpace rest)]) clen
+          (name,':':rest) ->
+            case map Char.toLower name of
+              "content-length" ->
+                readHeaders h mode uri (hds ++ [(name,dropWhile Char.isSpace rest)]) (Just (read rest))
+              _ ->
+                readHeaders h mode uri (hds ++ [(name,dropWhile Char.isSpace rest)]) clen
           _ -> hClose h -- strange format
 
       message code = show code ++ " " ++ 
