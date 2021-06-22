@@ -13,7 +13,7 @@ Description:
 Maintainer:     Ganesh Sittampalam
 Copyright:      (c) 2009 Andy Gill
 Build-Type:     Simple
-cabal-version:  >= 1.6
+cabal-version:  >= 1.8
 
 Source-Repository head
   Type:        git
