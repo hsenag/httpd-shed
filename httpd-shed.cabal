@@ -43,7 +43,7 @@ Library
      build-depends: network < 2.7
   Build-Depends:
     network >=2.3     && <3.2,
-    network-uri >=2.5 && <2.7,
+    network-uri >=2.5 && <2.8,
     base >= 4.0 && <5.0
   Ghc-Options: -Wall
   Exposed-modules:
