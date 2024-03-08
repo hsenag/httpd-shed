@@ -55,5 +55,6 @@ Executable httpd-shed-test
   default-language: Haskell2010
   If !flag(buildExamples)
     Buildable: False
+  build-depends: base, httpd-shed, network, network-uri, network-bsd
   Main-Is:        Main.hs
-  Hs-Source-Dirs: ., test
+  Hs-Source-Dirs: test
